@@ -4,6 +4,15 @@
 
 FROM composer:2.10.2 AS composer
 
+# Dashboard CSS and JS (Vite + Tailwind).
+FROM node:24.21.0-alpine3.24 AS assets
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts
+COPY vite.config.js ./
+COPY resources ./resources
+RUN npm run build
+
 FROM php:8.4.25-apache-trixie AS base
 RUN apt-get update && apt-get install -y --no-install-recommends libicu-dev libzip-dev unzip \
     && docker-php-ext-install -j"$(nproc)" pdo_mysql intl zip bcmath pcntl opcache \
@@ -15,6 +24,7 @@ RUN sed -ri 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-avail
     && sed -ri 's/Listen 80$/Listen 8080/' /etc/apache2/ports.conf \
     && sed -ri 's/<VirtualHost \*:80>/<VirtualHost *:8080>/' /etc/apache2/sites-available/000-default.conf \
     && a2enmod rewrite headers
+COPY docker/apache.conf /etc/apache2/conf-enabled/postbag.conf
 WORKDIR /app
 
 # Development: the source is mounted, so nothing is copied in. Apache listens on 8080 so it can
@@ -26,6 +36,7 @@ FROM base AS build
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
 COPY . .
+COPY --from=assets /app/public/build ./public/build
 RUN composer dump-autoload --optimize --classmap-authoritative --no-dev
 
 FROM base AS app
