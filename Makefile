@@ -8,6 +8,7 @@ up: ## Start MySQL, the app (http://localhost:8080), worker, scheduler and Mailp
 	@test -f .env || (cp .env.example .env && printf "UID=$$(id -u)\nGID=$$(id -g)\n" >> .env)
 	$(DC) up -d --build mysql mailpit
 	$(RUN) composer install --no-interaction
+	$(DC) run --rm -T -w /app/wordpress-plugin app composer install --no-interaction
 	@grep -q '^APP_KEY=base64' .env || $(RUN) php artisan key:generate
 	$(RUN) php artisan migrate --force
 	npm ci && npm run build
