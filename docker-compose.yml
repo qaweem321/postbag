@@ -16,6 +16,7 @@ x-app: &app
     COMPOSER_HOME: /tmp/composer
   depends_on:
     mysql: { condition: service_healthy }
+  restart: unless-stopped
 
 services:
   mysql:
@@ -56,8 +57,8 @@ services:
       - "8025:8025"
 
   wordpress:
-    image: wordpress:7.1.2-php8.4-apache
-    environment:
+    image: wordpress:7.1.1-php8.4-apache
+    environment: &wp-env
       WORDPRESS_DB_HOST: mysql
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_PASSWORD: wordpress
@@ -65,10 +66,24 @@ services:
     ports:
       - "8081:80"
     volumes:
-      - ./wordpress-plugin:/var/www/html/wp-content/plugins/postbag-signup
+      - wordpress:/var/www/html
+      - ./wordpress-plugin:/var/www/html/wp-content/plugins/postbag-signup:ro
+    depends_on:
+      mysql: { condition: service_healthy }
+    profiles: ["wordpress"]
+
+  # One-off WP-CLI container: `make wordpress` uses it to install the demo site and the plugin.
+  wpcli:
+    image: wordpress:cli-2.12.0-php8.4
+    user: "33:33"
+    environment: *wp-env
+    volumes:
+      - wordpress:/var/www/html
+      - ./wordpress-plugin:/var/www/html/wp-content/plugins/postbag-signup:ro
     depends_on:
       mysql: { condition: service_healthy }
     profiles: ["wordpress"]
 
 volumes:
   mysqldata:
+  wordpress:

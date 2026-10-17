@@ -1,0 +1,9 @@
+.postbag-signup { display: grid; gap: 0.5rem; max-width: 32rem; }
+.postbag-signup__title { margin: 0; font-weight: 600; }
+.postbag-signup__fields { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.postbag-signup__fields input { flex: 1 1 12rem; min-width: 0; padding: 0.6em 0.8em; }
+.postbag-signup__fields button { padding: 0.6em 1.2em; cursor: pointer; }
+.postbag-signup__fields button:disabled { opacity: 0.6; cursor: wait; }
+.postbag-signup__message { margin: 0; min-height: 1.5em; font-size: 0.9em; }
+.postbag-signup__message.is-error { color: #b91c1c; }
+.postbag-signup__hp { position: absolute !important; left: -10000px; width: 1px; height: 1px; overflow: hidden; }

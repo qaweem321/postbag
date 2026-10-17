@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<ruleset name="Postbag Signup">
+    <description>WordPress Coding Standards for the plugin.</description>
+    <file>.</file>
+    <exclude-pattern>vendor/*</exclude-pattern>
+    <exclude-pattern>tests/*</exclude-pattern>
+    <arg name="extensions" value="php"/>
+    <arg value="sp"/>
+
+    <config name="minimum_wp_version" value="6.6"/>
+    <config name="testVersion" value="8.1-"/>
+
+    <rule ref="WordPress">
+        <!-- Class files use the "class-name.php" convention; PSR-4 is not used. -->
+        <exclude name="Squiz.Commenting.FileComment.MissingPackageTag"/>
+    </rule>
+    <rule ref="PHPCompatibilityWP"/>
+    <!-- index.asset.php is the name WordPress looks for next to a block's script. -->
+    <rule ref="WordPress.Files.FileName">
+        <exclude-pattern>blocks/*/index.asset.php</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array">
+                <element value="postbag-signup"/>
+            </property>
+        </properties>
+    </rule>
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+        <properties>
+            <property name="prefixes" type="array">
+                <element value="postbag_signup"/>
+                <element value="Postbag_Signup"/>
+                <element value="postbag"/>
+            </property>
+        </properties>
+    </rule>
+</ruleset>

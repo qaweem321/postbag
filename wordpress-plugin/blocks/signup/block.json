@@ -1,0 +1,20 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "postbag/signup",
+	"title": "Newsletter signup",
+	"category": "widgets",
+	"icon": "email-alt",
+	"description": "A signup form that adds subscribers to a Postbag list.",
+	"keywords": [ "newsletter", "email", "subscribe", "postbag" ],
+	"textdomain": "postbag-signup",
+	"attributes": {
+		"listId": { "type": "string", "default": "" },
+		"title": { "type": "string", "default": "Subscribe to our newsletter" },
+		"buttonText": { "type": "string", "default": "Subscribe" },
+		"showName": { "type": "boolean", "default": false }
+	},
+	"supports": { "html": false, "align": [ "wide", "full" ], "spacing": { "margin": true, "padding": true } },
+	"editorScript": "file:./index.js",
+	"render": "file:./render.php"
+}

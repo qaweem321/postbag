@@ -1,0 +1,25 @@
+{
+    "name": "qaweem321/postbag-signup",
+    "description": "WordPress plugin: newsletter signup forms for Postbag.",
+    "type": "wordpress-plugin",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.1"
+    },
+    "require-dev": {
+        "brain/monkey": "2.7.0",
+        "dealerdirect/phpcodesniffer-composer-installer": "1.2.1",
+        "phpcompatibility/phpcompatibility-wp": "2.1.8",
+        "phpunit/phpunit": "13.4.0",
+        "wp-coding-standards/wpcs": "3.4.1"
+    },
+    "scripts": {
+        "test": "phpunit",
+        "lint": "phpcs"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}
