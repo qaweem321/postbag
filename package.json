@@ -1,0 +1,20 @@
+{
+    "$schema": "https://www.schemastore.org/package.json",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite",
+        "prepare": "husky"
+    },
+    "devDependencies": {
+        "@commitlint/cli": "21.2.3",
+        "@commitlint/config-conventional": "21.2.3",
+        "@tailwindcss/vite": "4.3.3",
+        "husky": "9.1.7",
+        "laravel-vite-plugin": "3.2.0",
+        "lint-staged": "17.6.0",
+        "tailwindcss": "4.3.3",
+        "vite": "8.3.2"
+    }
+}

@@ -1,0 +1,71 @@
+# Local development and demo.
+#   make up        # MySQL, the app (http://localhost:8080), queue worker, scheduler, Mailpit (http://localhost:8025)
+#   make wordpress # also a demo WordPress site with the plugin (http://localhost:8081)
+#
+# Passwords and keys here are for local use only.
+
+x-app: &app
+  build: { context: ., dockerfile: docker/Dockerfile, target: dev }
+  image: postbag-dev
+  user: "${UID:-1000}:${GID:-1000}"
+  volumes:
+    - .:/app
+  env_file: .env
+  environment:
+    COMPOSER_HOME: /tmp/composer
+  depends_on:
+    mysql: { condition: service_healthy }
+
+services:
+  mysql:
+    image: mysql:8.4.10
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: postbag
+      MYSQL_USER: postbag
+      MYSQL_PASSWORD: postbag
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysqldata:/var/lib/mysql
+      - ./docker/mysql-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot", "--silent"]
+      interval: 5s
+      retries: 30
+
+  app:
+    <<: *app
+    ports:
+      - "8080:8080"
+
+  worker:
+    <<: *app
+    command: ["php", "artisan", "queue:work", "--tries=3", "--backoff=10", "--max-time=3600"]
+
+  scheduler:
+    <<: *app
+    command: ["php", "artisan", "schedule:work"]
+
+  mailpit:
+    image: axllent/mailpit:v1.31.2
+    ports:
+      - "8025:8025"
+
+  wordpress:
+    image: wordpress:7.1.2-php8.4-apache
+    environment:
+      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    ports:
+      - "8081:80"
+    volumes:
+      - ./wordpress-plugin:/var/www/html/wp-content/plugins/postbag-signup
+    depends_on:
+      mysql: { condition: service_healthy }
+    profiles: ["wordpress"]
+
+volumes:
+  mysqldata:
