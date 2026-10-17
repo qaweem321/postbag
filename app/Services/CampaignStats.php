@@ -11,7 +11,7 @@ class CampaignStats
     /**
      * Delivery and engagement numbers for one campaign, from a single aggregate query.
      *
-     * @return array{recipients: int, sent: int, failed: int, skipped: int, queued: int, opened: int, clicked: int, unsubscribed: int, open_rate: float|null, click_rate: float|null, links: list<array{url: string, clicks: int}>}
+     * @return array{recipients: int, sent: int, failed: int, skipped: int, queued: int, opened: int, clicked: int, unsubscribed: int, open_rate: float|null, click_rate: float|null, links: array<int, array{url: string, clicks: int}>}
      */
     public function for(Campaign $campaign): array
     {
@@ -32,6 +32,8 @@ class CampaignStats
         $sent = (int) ($row->sent ?? 0);
         $links = $campaign->links()->orderByDesc('click_count')->limit(10)->get(['url', 'click_count'])
             ->map(fn ($link) => ['url' => $link->url, 'clicks' => $link->click_count])->values()->all();
+        $opened = (int) ($row->opened ?? 0);
+        $clicked = (int) ($row->clicked ?? 0);
 
         return [
             'recipients' => (int) ($row->recipients ?? 0),
@@ -39,11 +41,11 @@ class CampaignStats
             'failed' => (int) ($row->failed ?? 0),
             'skipped' => (int) ($row->skipped ?? 0),
             'queued' => (int) ($row->queued ?? 0),
-            'opened' => (int) ($row->opened ?? 0),
-            'clicked' => (int) ($row->clicked ?? 0),
+            'opened' => $opened,
+            'clicked' => $clicked,
             'unsubscribed' => (int) ($row->unsubscribed ?? 0),
-            'open_rate' => $sent > 0 ? round(((int) $row->opened) / $sent, 4) : null,
-            'click_rate' => $sent > 0 ? round(((int) $row->clicked) / $sent, 4) : null,
+            'open_rate' => $sent > 0 ? round($opened / $sent, 4) : null,
+            'click_rate' => $sent > 0 ? round($clicked / $sent, 4) : null,
             'links' => $links,
         ];
     }

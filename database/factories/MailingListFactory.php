@@ -10,7 +10,7 @@ class MailingListFactory extends Factory
 {
     public function definition(): array
     {
-        return ['name' => ucfirst(fake()->words(2, true)), 'description' => fake()->sentence(), 'double_opt_in' => true];
+        return ['name' => fake()->randomElement(['Weekly digest', 'Product updates', 'Engineering blog', 'Events']), 'description' => fake()->sentence(), 'double_opt_in' => true];
     }
 
     public function singleOptIn(): static

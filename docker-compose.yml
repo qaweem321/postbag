@@ -10,7 +10,8 @@ x-app: &app
   user: "${UID:-1000}:${GID:-1000}"
   volumes:
     - .:/app
-  env_file: .env
+  # Laravel reads .env itself. Passing it as container environment would override phpunit.xml,
+  # and the tests would run against the development database.
   environment:
     COMPOSER_HOME: /tmp/composer
   depends_on:

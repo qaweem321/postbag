@@ -24,6 +24,9 @@ class Subscriber extends Model
     /** @use HasFactory<SubscriberFactory> */
     use HasFactory, HasUuids;
 
+    /** Same defaults as the database, so new models have them before being reloaded. */
+    protected $attributes = ['status' => 'active'];
+
     protected $fillable = ['email', 'name', 'status', 'suppressed_at'];
 
     protected function casts(): array
@@ -31,6 +34,7 @@ class Subscriber extends Model
         return ['status' => SubscriberStatus::class, 'suppressed_at' => 'datetime'];
     }
 
+    /** @return list<string> */
     public function uniqueIds(): array
     {
         return ['uuid'];
@@ -41,7 +45,11 @@ class Subscriber extends Model
         return mb_strtolower(trim($email));
     }
 
-    /** Emails are stored lowercase, so lookups and the unique index ignore case. */
+    /**
+     * Emails are stored lowercase, so lookups and the unique index ignore case.
+     *
+     * @return Attribute<string, string>
+     */
     protected function email(): Attribute
     {
         return Attribute::set(fn (string $value) => self::normalizeEmail($value));

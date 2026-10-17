@@ -30,7 +30,7 @@ class ConfirmSubscription extends Mailable implements ShouldQueue
         return new Content(markdown: 'emails.confirm-subscription', with: [
             'listName' => $this->subscription->mailingList->name,
             // Signed and valid for a week: the link can't be guessed or edited to confirm someone else.
-            'url' => URL::temporarySignedRoute('subscriptions.confirm', now()->addDays(7), $this->subscription),
+            'url' => URL::temporarySignedRoute('subscriptions.confirm', now()->addDays(7), ['subscription' => $this->subscription->uuid]),
         ]);
     }
 }

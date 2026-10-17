@@ -99,7 +99,7 @@ class CampaignSender
         $size = max(1, (int) config('postbag.batch_size'));
         $campaign->sends()->select('id')->orderBy('id')->chunkById(1000, function ($sends) use ($batch, $campaignId, $size) {
             $batch->add($sends->pluck('id')->chunk($size)->map(
-                fn ($ids) => new SendCampaignBatch($campaignId, $ids->values()->all()),
+                fn ($ids) => new SendCampaignBatch($campaignId, array_values(array_map(intval(...), $ids->all()))),
             )->all());
         });
     }

@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'abilities' => CheckAbilities::class,
+            'no-store' => NoStore::class,
         ]);
         // Logged-out visitors go to the login page, which sends them back afterwards.
         $middleware->redirectGuestsTo(fn () => route('login'));
@@ -26,7 +27,6 @@ return Application::configure(basePath: dirname(__DIR__))
         // One-click unsubscribe (RFC 8058) is a POST from the mail provider, without a CSRF token.
         // The signed URL is what authorizes it.
         $middleware->validateCsrfTokens(except: ['unsubscribe/*']);
-        $middleware->alias(['no-store' => NoStore::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

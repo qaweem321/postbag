@@ -14,6 +14,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class CampaignLink extends Model
 {
+    /** Same defaults as the database, so new models have them before being reloaded. */
+    protected $attributes = ['click_count' => 0];
+
     protected $fillable = ['campaign_id', 'url', 'url_hash'];
 
     /** @return BelongsTo<Campaign, $this> */

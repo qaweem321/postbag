@@ -21,6 +21,9 @@ class MailingList extends Model
     /** @use HasFactory<MailingListFactory> */
     use HasFactory, HasUuids;
 
+    /** Same defaults as the database, so new models have them before being reloaded. */
+    protected $attributes = ['double_opt_in' => true];
+
     protected $fillable = ['name', 'description', 'double_opt_in'];
 
     protected function casts(): array
@@ -28,7 +31,11 @@ class MailingList extends Model
         return ['double_opt_in' => 'boolean'];
     }
 
-    /** Public identifiers are UUIDs, so ids can't be guessed or counted. */
+    /**
+     * Public identifiers are UUIDs, so ids can't be guessed or counted.
+     *
+     * @return list<string>
+     */
     public function uniqueIds(): array
     {
         return ['uuid'];

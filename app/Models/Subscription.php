@@ -40,6 +40,7 @@ class Subscription extends Model
         ];
     }
 
+    /** @return list<string> */
     public function uniqueIds(): array
     {
         return ['uuid'];

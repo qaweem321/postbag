@@ -29,6 +29,9 @@ class CampaignSend extends Model
 {
     use HasUuids;
 
+    /** Same defaults as the database, so new models have them before being reloaded. */
+    protected $attributes = ['status' => 'pending', 'open_count' => 0, 'click_count' => 0];
+
     protected $guarded = [];
 
     protected function casts(): array
@@ -41,6 +44,7 @@ class CampaignSend extends Model
         ];
     }
 
+    /** @return list<string> */
     public function uniqueIds(): array
     {
         return ['uuid'];

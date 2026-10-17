@@ -33,6 +33,9 @@ class Campaign extends Model
     /** @use HasFactory<CampaignFactory> */
     use HasFactory, HasUuids;
 
+    /** Same defaults as the database, so new models have them before being reloaded. */
+    protected $attributes = ['status' => 'draft', 'recipients_count' => 0];
+
     protected $fillable = ['mailing_list_id', 'name', 'subject', 'from_name', 'from_email', 'body_markdown', 'scheduled_at'];
 
     protected function casts(): array
@@ -45,6 +48,7 @@ class Campaign extends Model
         ];
     }
 
+    /** @return list<string> */
     public function uniqueIds(): array
     {
         return ['uuid'];
