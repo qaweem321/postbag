@@ -25,6 +25,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $started_at
  * @property Carbon|null $finished_at
  * @property int $recipients_count
+ * @property string|null $batch_id
  * @property-read MailingList $mailingList
  */
 class Campaign extends Model

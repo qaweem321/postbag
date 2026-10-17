@@ -36,6 +36,8 @@ services:
 
   app:
     <<: *app
+    # Development uses PHP's built-in server; the production image (target "app") runs Apache.
+    command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
     ports:
       - "8080:8080"
 

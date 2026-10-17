@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
  * @property int $subscriber_id
  * @property SubscriptionStatus $status
  * @property string $source
+ * @property Carbon|null $confirmation_sent_at
  * @property Carbon|null $confirmed_at
  * @property Carbon|null $unsubscribed_at
  * @property-read MailingList $mailingList
@@ -27,12 +28,13 @@ class Subscription extends Model
     /** @use HasFactory<SubscriptionFactory> */
     use HasFactory, HasUuids;
 
-    protected $fillable = ['mailing_list_id', 'subscriber_id', 'status', 'source', 'confirmed_at', 'unsubscribed_at'];
+    protected $fillable = ['mailing_list_id', 'subscriber_id', 'status', 'source', 'confirmation_sent_at', 'confirmed_at', 'unsubscribed_at'];
 
     protected function casts(): array
     {
         return [
             'status' => SubscriptionStatus::class,
+            'confirmation_sent_at' => 'datetime',
             'confirmed_at' => 'datetime',
             'unsubscribed_at' => 'datetime',
         ];

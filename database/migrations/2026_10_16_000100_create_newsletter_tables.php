@@ -36,6 +36,8 @@ return new class extends Migration
             $table->foreignId('subscriber_id')->constrained()->cascadeOnDelete();
             $table->string('status', 16); // pending, subscribed, unsubscribed
             $table->string('source', 32)->default('api'); // api, dashboard, import, wordpress
+            // Re-sending the confirmation email is throttled, so a public form can't be used to flood an inbox.
+            $table->timestamp('confirmation_sent_at')->nullable();
             $table->timestamp('confirmed_at')->nullable();
             $table->timestamp('unsubscribed_at')->nullable();
             $table->timestamps();
@@ -58,6 +60,7 @@ return new class extends Migration
             $table->timestamp('started_at')->nullable();
             $table->timestamp('finished_at')->nullable();
             $table->unsignedInteger('recipients_count')->default(0);
+            $table->string('batch_id', 36)->nullable(); // the queued job batch sending it
             $table->timestamps();
             $table->index(['status', 'scheduled_at']);
         });

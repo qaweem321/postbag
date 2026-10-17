@@ -1,9 +1,50 @@
 @import 'tailwindcss';
 
+@source '../views/**/*.blade.php';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+@utility btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60;
+}
+@utility btn-primary {
+    @apply btn bg-violet-700 text-white hover:bg-violet-600;
+}
+@utility btn-secondary {
+    @apply btn border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50;
+}
+@utility btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-500;
+}
+@utility card {
+    @apply rounded-xl border border-zinc-200 bg-white shadow-sm;
+}
+@utility input {
+    @apply block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm shadow-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-600/20;
+}
+@utility label {
+    @apply mb-1 block text-sm font-medium text-zinc-700;
+}
+@utility muted {
+    @apply text-zinc-500;
+}
+
+@layer base {
+    body {
+        @apply bg-zinc-50 text-zinc-900 antialiased;
+    }
+}
+
+@layer components {
+    .table {
+        @apply w-full text-left text-sm;
+    }
+    .table th {
+        @apply border-b border-zinc-200 px-4 py-2.5 text-xs font-semibold tracking-wide text-zinc-500 uppercase;
+    }
+    .table td {
+        @apply border-b border-zinc-100 px-4 py-3 align-top;
+    }
+    .table tr:last-child td {
+        @apply border-b-0;
+    }
 }

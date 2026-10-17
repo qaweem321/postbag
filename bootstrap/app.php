@@ -1,9 +1,12 @@
 <?php
 
+use App\Http\Middleware\NoStore;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Laravel\Sanctum\Http\Middleware\CheckAbilities;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,7 +16,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'abilities' => CheckAbilities::class,
+        ]);
+        // Logged-out visitors go to the login page, which sends them back afterwards.
+        $middleware->redirectGuestsTo(fn () => route('login'));
+        $middleware->redirectUsersTo(fn () => route('dashboard'));
+        $middleware->append(SecurityHeaders::class);
+        // One-click unsubscribe (RFC 8058) is a POST from the mail provider, without a CSRF token.
+        // The signed URL is what authorizes it.
+        $middleware->validateCsrfTokens(except: ['unsubscribe/*']);
+        $middleware->alias(['no-store' => NoStore::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

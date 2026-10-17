@@ -33,6 +33,7 @@ RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
     && printf "opcache.validate_timestamps=0\nexpose_php=Off\n" > "$PHP_INI_DIR/conf.d/zz-app.ini" \
     && echo "ServerTokens Prod\nServerSignature Off" >> /etc/apache2/conf-available/security.conf
 COPY --from=build --chown=www-data:www-data /app /app
+RUN chown -R www-data:www-data /var/run/apache2 /var/log/apache2 /var/lock/apache2
 USER www-data
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s CMD php -r "exit(@file_get_contents('http://127.0.0.1:8080/up') === false ? 1 : 0);"
