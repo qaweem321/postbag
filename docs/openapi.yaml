@@ -1,0 +1,189 @@
+openapi: 3.1.0
+info:
+  title: Postbag API
+  version: 1.0.0
+  description: |
+    Manage subscribers from other apps. Authenticate with a token from the dashboard
+    (API tokens page): `Authorization: Bearer <token>`. Tokens have the `read` and/or `write`
+    ability. Limit: 120 requests per minute per token. Errors are JSON: `{"message": "..."}`,
+    plus `errors` per field for validation errors (422).
+servers:
+  - url: http://localhost:8080/api/v1
+security:
+  - bearer: []
+paths:
+  /lists:
+    get:
+      summary: All lists, with their number of subscribed people
+      description: Needs the read ability.
+      responses:
+        "200":
+          description: Lists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/List" } }
+  /lists/{list}:
+    get:
+      summary: One list
+      parameters: [{ $ref: "#/components/parameters/list" }]
+      responses:
+        "200": { description: The list, content: { application/json: { schema: { type: object, properties: { data: { $ref: "#/components/schemas/List" } } } } } }
+        "404": { description: No such list }
+  /lists/{list}/subscribers:
+    get:
+      summary: Subscriptions of a list, oldest first, with cursor pagination
+      parameters:
+        - { $ref: "#/components/parameters/list" }
+        - { name: status, in: query, schema: { type: string, enum: [pending, subscribed, unsubscribed] } }
+        - { name: per_page, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+        - { name: cursor, in: query, description: "meta.next_cursor from the previous page", schema: { type: string } }
+      responses:
+        "200":
+          description: One page
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Subscription" } }
+                  meta: { type: object, properties: { next_cursor: { type: [string, "null"] }, per_page: { type: integer } } }
+    post:
+      summary: Subscribe an email address
+      description: |
+        Needs the write ability. Safe to repeat: the same address is never subscribed twice.
+        On a double opt-in list the subscription stays `pending` and Postbag emails a
+        confirmation link (at most once per 15 minutes per address).
+      parameters: [{ $ref: "#/components/parameters/list" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+                name: { type: string, maxLength: 120 }
+                source: { type: string, description: "Where the signup came from, e.g. wordpress", default: api }
+                skip_confirmation: { type: boolean, description: "Only for addresses that already proved they own the inbox", default: false }
+      responses:
+        "201":
+          description: Subscribed, or waiting for confirmation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/Subscription" }
+                  outcome: { type: string, enum: [subscribed, pending_confirmation] }
+        "200":
+          description: Already subscribed (outcome is already_subscribed)
+        "422":
+          description: Invalid email, or the address bounced or reported spam before
+  /lists/{list}/subscribers/{email}:
+    parameters:
+      - { $ref: "#/components/parameters/list" }
+      - { name: email, in: path, required: true, schema: { type: string, format: email } }
+    get:
+      summary: One subscription, by email (case-insensitive)
+      responses:
+        "200": { description: The subscription, content: { application/json: { schema: { type: object, properties: { data: { $ref: "#/components/schemas/Subscription" } } } } } }
+        "404": { description: Not on this list }
+    delete:
+      summary: Unsubscribe
+      description: Needs the write ability. The subscription is kept with status unsubscribed.
+      responses:
+        "200": { description: Unsubscribed }
+        "404": { description: Not on this list }
+  /suppressions:
+    post:
+      summary: Record a bounce or spam complaint
+      description: |
+        Needs the write ability. Call it from your mail provider's webhook. A suppressed
+        address gets no email from any list and can't be subscribed again.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, reason]
+              properties:
+                email: { type: string, format: email }
+                reason: { type: string, enum: [bounced, complained] }
+      responses:
+        "200": { description: Recorded }
+  /campaigns:
+    get:
+      summary: Campaigns, newest first (25 per page)
+      responses:
+        "200": { description: Campaigns, content: { application/json: { schema: { type: object, properties: { data: { type: array, items: { $ref: "#/components/schemas/Campaign" } } } } } } }
+  /campaigns/{campaign}:
+    get:
+      summary: One campaign, with delivery and engagement statistics
+      parameters: [{ name: campaign, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "200":
+          description: The campaign
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/Campaign" }
+                  stats:
+                    type: object
+                    properties:
+                      recipients: { type: integer }
+                      sent: { type: integer }
+                      failed: { type: integer }
+                      skipped: { type: integer }
+                      queued: { type: integer }
+                      opened: { type: integer }
+                      clicked: { type: integer }
+                      unsubscribed: { type: integer }
+                      open_rate: { type: [number, "null"] }
+                      click_rate: { type: [number, "null"] }
+                      links: { type: array, items: { type: object, properties: { url: { type: string }, clicks: { type: integer } } } }
+components:
+  securitySchemes:
+    bearer: { type: http, scheme: bearer }
+  parameters:
+    list: { name: list, in: path, required: true, description: List ID, schema: { type: string, format: uuid } }
+  schemas:
+    List:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: [string, "null"] }
+        double_opt_in: { type: boolean }
+        subscribed_count: { type: integer }
+        created_at: { type: string, format: date-time }
+    Subscription:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        name: { type: [string, "null"] }
+        list_id: { type: string, format: uuid }
+        status: { type: string, enum: [pending, subscribed, unsubscribed] }
+        source: { type: string }
+        confirmed_at: { type: [string, "null"], format: date-time }
+        unsubscribed_at: { type: [string, "null"], format: date-time }
+        created_at: { type: string, format: date-time }
+    Campaign:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        subject: { type: string }
+        list_id: { type: string, format: uuid }
+        status: { type: string, enum: [draft, scheduled, sending, sent, cancelled] }
+        scheduled_at: { type: [string, "null"], format: date-time }
+        started_at: { type: [string, "null"], format: date-time }
+        finished_at: { type: [string, "null"], format: date-time }
+        recipients: { type: integer }
