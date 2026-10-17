@@ -1,7 +1,8 @@
 <?php
-
 /**
  * POST /wp-json/postbag/v1/subscribe
+ *
+ * @package PostbagSignup
  */
 
 namespace Postbag_Signup;
@@ -10,82 +11,78 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
 
-defined('ABSPATH') || exit;
+defined( 'ABSPATH' ) || exit;
 
 /**
  * The public endpoint the form submits to. It is open to visitors on purpose (no nonce, so the
  * form keeps working on cached pages); the honeypot, timing check and per-IP limit stop abuse.
  */
-class Rest_Controller
-{
-    /**
-     * Signup handler.
-     *
-     * @var Signup
-     */
-    private $signup;
+class Rest_Controller {
 
-    /**
-     * Constructor.
-     *
-     * @param  Signup  $signup  Signup handler.
-     */
-    public function __construct(Signup $signup)
-    {
-        $this->signup = $signup;
-    }
+	/**
+	 * Signup handler.
+	 *
+	 * @var Signup
+	 */
+	private $signup;
 
-    /**
-     * Registers the route.
-     */
-    public function register_hooks(): void
-    {
-        add_action('rest_api_init', [$this, 'register_routes']);
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param  Signup $signup  Signup handler.
+	 */
+	public function __construct( Signup $signup ) {
+		$this->signup = $signup;
+	}
 
-    /**
-     * Route definition.
-     */
-    public function register_routes(): void
-    {
-        register_rest_route(
-            'postbag/v1',
-            '/subscribe',
-            [
-                'methods' => WP_REST_Server::CREATABLE,
-                'callback' => [$this, 'subscribe'],
-                'permission_callback' => '__return_true',
-                'args' => [
-                    'email' => [
-                        'type' => 'string',
-                        'required' => true,
-                    ],
-                    'name' => ['type' => 'string'],
-                    'list' => ['type' => 'string'],
-                    'website' => ['type' => 'string'],
-                    'started' => ['type' => 'integer'],
-                ],
-            ]
-        );
-    }
+	/**
+	 * Registers the route.
+	 */
+	public function register_hooks(): void {
+		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
+	}
 
-    /**
-     * Handles a submission.
-     *
-     * @param  WP_REST_Request  $request  Request.
-     */
-    public function subscribe(WP_REST_Request $request): WP_REST_Response
-    {
-        $ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '';
-        $result = $this->signup->handle($request->get_params(), $ip);
+	/**
+	 * Route definition.
+	 */
+	public function register_routes(): void {
+		register_rest_route(
+			'postbag/v1',
+			'/subscribe',
+			array(
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'subscribe' ),
+				'permission_callback' => '__return_true',
+				'args'                => array(
+					'email'   => array(
+						'type'     => 'string',
+						'required' => true,
+					),
+					'name'    => array( 'type' => 'string' ),
+					'list'    => array( 'type' => 'string' ),
+					'website' => array( 'type' => 'string' ),
+					'started' => array( 'type' => 'integer' ),
+				),
+			)
+		);
+	}
 
-        if (is_wp_error($result)) {
-            $data = $result->get_error_data();
-            $status = is_array($data) && isset($data['status']) ? (int) $data['status'] : 502;
+	/**
+	 * Handles a submission.
+	 *
+	 * @param  WP_REST_Request $request  Request.
+	 */
+	public function subscribe( WP_REST_Request $request ): WP_REST_Response {
+		$ip     = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+		$result = $this->signup->handle( $request->get_params(), $ip );
 
-            return new WP_REST_Response(['message' => $result->get_error_message()], $status);
-        }
+		if ( is_wp_error( $result ) ) {
+			$data   = $result->get_error_data();
+			$status = is_array( $data ) && isset( $data['status'] ) ? (int) $data['status'] : 502;
 
-        return new WP_REST_Response(['message' => $result], 200);
-    }
+			return new WP_REST_Response( array( 'message' => $result->get_error_message() ), $status );
+		}
+
+		return new WP_REST_Response( array( 'message' => $result ), 200 );
+	}
 }
