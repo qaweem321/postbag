@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  laravel:
+    name: Laravel (Pint, PHPStan, Pest on MySQL)
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4.10
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: postbag_test
+          MYSQL_USER: postbag
+          MYSQL_PASSWORD: postbag
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -uroot -proot --silent" --health-interval 5s --health-retries 30
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USERNAME: postbag
+      DB_PASSWORD: postbag
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: shivammathur/setup-php@2.37.2
+        with:
+          php-version: "8.4"
+          extensions: pdo_mysql, intl, zip, bcmath
+          coverage: none
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: composer install --no-interaction --prefer-dist
+      - run: npm ci && npm run build
+      - run: cp .env.example .env && php artisan key:generate
+      - run: vendor/bin/pint --test
+      - run: vendor/bin/phpstan analyse --memory-limit=1G --no-progress
+      - run: php artisan test
+
+  wordpress-plugin:
+    name: WordPress plugin (PHPCS, PHPUnit)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: wordpress-plugin
+    steps:
+      - uses: actions/checkout@v7.0.1
+      # The plugin runs on PHP 8.1+ (PHPCompatibility checks that); the test tools need 8.4.
+      - uses: shivammathur/setup-php@2.37.2
+        with:
+          php-version: "8.4"
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist
+      - run: vendor/bin/phpcs
+      - run: vendor/bin/phpunit
+
+  commits:
+    name: Commit messages
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+
+  docker:
+    name: Production image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: docker/setup-buildx-action@v4.4.1
+      - uses: docker/build-push-action@v7.4.0
+        with:
+          context: .
+          file: docker/Dockerfile
+          target: app
+          tags: postbag:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
