@@ -32,9 +32,11 @@ class SubscriptionLinkController extends Controller
         $this->subscriptions->confirm($subscription);
         $subscription->load('mailingList');
 
+        $subscribed = $subscription->status === SubscriptionStatus::Subscribed;
+
         return view('public.message', [
-            'title' => 'You\'re subscribed',
-            'message' => $subscription->status === SubscriptionStatus::Subscribed
+            'title' => $subscribed ? 'You\'re subscribed' : 'Not subscribed',
+            'message' => $subscribed
                 ? "Thanks! You'll now receive {$subscription->mailingList->name}."
                 : 'This subscription was cancelled earlier, so it wasn\'t confirmed. Sign up again to resubscribe.',
         ]);

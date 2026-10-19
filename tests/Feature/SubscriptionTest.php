@@ -73,6 +73,19 @@ it('confirms only through a POST to the signed link', function () {
     $this->post($url)->assertForbidden();
 });
 
+it('does not claim success when an old confirmation link is used after unsubscribing', function () {
+    $list = MailingList::factory()->create();
+    app(SubscriptionManager::class)->subscribe($list, 'a@example.com');
+    $subscription = Subscription::query()->sole();
+    app(SubscriptionManager::class)->unsubscribe($subscription);
+
+    $this->post(URL::temporarySignedRoute('subscriptions.confirm', now()->addDay(), $subscription))
+        ->assertOk()
+        ->assertSee('Not subscribed')
+        ->assertDontSee('You\'re subscribed');
+    expect($subscription->fresh()->status)->toBe(SubscriptionStatus::Unsubscribed);
+});
+
 it('unsubscribes with one click, without a CSRF token', function () {
     $subscription = Subscription::factory()->create();
     $url = URL::signedRoute('subscriptions.unsubscribe', $subscription);
