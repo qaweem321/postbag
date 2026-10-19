@@ -7,7 +7,7 @@
                 <h1 class="text-2xl font-semibold tracking-tight">{{ $campaign->name }}</h1>
                 <x-status-badge :status="$campaign->status" />
             </div>
-            <p class="muted mt-1 text-sm">“{{ $campaign->subject }}” to <a class="text-violet-700 hover:underline" href="{{ route('lists.show', $campaign->mailingList) }}">{{ $campaign->mailingList->name }}</a>
+            <p class="muted mt-1 text-sm">“{{ $campaign->subject }}” to <a class="text-violet-700 underline" href="{{ route('lists.show', $campaign->mailingList) }}">{{ $campaign->mailingList->name }}</a>
                 @if ($campaign->status === CampaignStatus::Scheduled) · scheduled for <x-date :value="$campaign->scheduled_at" time /> @endif
                 @if ($campaign->started_at) · started <x-date :value="$campaign->started_at" time /> @endif
             </p>

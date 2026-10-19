@@ -15,7 +15,7 @@
             @else
                 <div class="card overflow-x-auto">
                     <table class="table">
-                        <thead><tr><th>Name</th><th>Permissions</th><th>Last used</th><th>Created</th><th></th></tr></thead>
+                        <thead><tr><th>Name</th><th>Permissions</th><th>Last used</th><th>Created</th><th><span class="sr-only">Actions</span></th></tr></thead>
                         <tbody>
                         @foreach ($tokens as $token)
                             <tr>

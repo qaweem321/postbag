@@ -32,7 +32,7 @@
             @else
                 <div class="card overflow-x-auto">
                     <table class="table">
-                        <thead><tr><th>Email</th><th>Status</th><th>Source</th><th>Since</th><th></th></tr></thead>
+                        <thead><tr><th>Email</th><th>Status</th><th>Source</th><th>Since</th><th><span class="sr-only">Actions</span></th></tr></thead>
                         <tbody>
                         @foreach ($subscriptions as $subscription)
                             <tr>
@@ -78,7 +78,7 @@
   -H "Authorization: Bearer $TOKEN" \
   -H "Accept: application/json" \
   -d email=jane@example.com</pre>
-                <p class="muted mt-2">Create a token with the “write” permission under <a class="text-violet-700 hover:underline" href="{{ route('tokens.index') }}">API tokens</a>. The WordPress plugin uses the same endpoint.</p>
+                <p class="muted mt-2">Create a token with the “write” permission under <a class="text-violet-700 underline" href="{{ route('tokens.index') }}">API tokens</a>. The WordPress plugin uses the same endpoint.</p>
             </div>
         </aside>
     </div>
