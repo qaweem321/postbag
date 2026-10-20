@@ -24,6 +24,19 @@ document.addEventListener(
     true,
 );
 
+// Password fields: the eye button shows or hides the password. It stays hidden without JavaScript.
+for (const button of document.querySelectorAll('[data-password-toggle]')) button.hidden = false;
+document.addEventListener('click', (event) => {
+    const button = event.target instanceof Element && event.target.closest('[data-password-toggle]');
+    if (!button) return;
+    const input = button.parentElement.querySelector('input');
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    button.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    button.querySelector('[data-eye]').toggleAttribute('hidden', show);
+    button.querySelector('[data-eye-off]').toggleAttribute('hidden', !show);
+});
+
 // A page restored from the back/forward cache may show a logged-out or outdated state: reload it.
 window.addEventListener('pageshow', (event) => {
     if (event.persisted) window.location.reload();

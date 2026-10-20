@@ -18,6 +18,13 @@ it('sends guests to login and back to the page they asked for', function () {
     $this->get('/login')->assertRedirect('/');
 });
 
+it('renders the login password field with a show/hide toggle', function () {
+    $this->get('/login')->assertOk()
+        ->assertSee('type="password"', false)
+        ->assertSee('data-password-toggle', false)
+        ->assertSee('aria-label="Show password"', false);
+});
+
 it('rejects wrong passwords and rate-limits guessing', function () {
     User::factory()->create(['email' => 'admin@example.com']);
     for ($i = 0; $i < 5; $i++) {

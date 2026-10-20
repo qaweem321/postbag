@@ -14,7 +14,7 @@
         </div>
         <div>
             <label class="label" for="password">Password</label>
-            <input class="input" id="password" name="password" type="password" autocomplete="current-password" required>
+            <x-password-input id="password" name="password" autocomplete="current-password" required />
         </div>
         <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="remember" class="accent-violet-700"> Keep me logged in</label>
         <button class="btn-primary w-full" data-pending="Logging in...">Log in</button>
