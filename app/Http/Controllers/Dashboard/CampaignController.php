@@ -62,6 +62,14 @@ class CampaignController extends Controller
         ]);
     }
 
+    // Just the statistics block, polled by the campaign page so it updates without a reload.
+    public function stats(Campaign $campaign, CampaignStats $stats): View
+    {
+        abort_if($campaign->status->isEditable(), 404);
+
+        return view('campaigns._stats', ['campaign' => $campaign, 'stats' => $stats->for($campaign)]);
+    }
+
     public function edit(Campaign $campaign): View|RedirectResponse
     {
         if (! $campaign->status->isEditable()) {

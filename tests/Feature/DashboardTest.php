@@ -93,6 +93,27 @@ it('creates, previews and sends a campaign', function () {
     $this->post("/campaigns/{$campaign->uuid}/send")->assertSessionHasErrors('campaign');
 });
 
+it('serves live campaign statistics for the page to poll', function () {
+    login();
+    Mail::fake();
+    $list = MailingList::factory()->create();
+    Subscription::factory()->count(2)->for($list)->create();
+    $campaign = Campaign::factory()->for($list)->create();
+
+    // Drafts have no statistics yet.
+    $this->get("/campaigns/{$campaign->uuid}/stats")->assertNotFound();
+
+    $this->post("/campaigns/{$campaign->uuid}/send");
+    $this->get("/campaigns/{$campaign->uuid}")->assertSee('data-live-stats', false);
+    $this->get("/campaigns/{$campaign->uuid}/stats")->assertOk()
+        ->assertSee('data-status="sent"', false)
+        ->assertSee('Delivered')
+        ->assertDontSee('<html', false);
+
+    auth()->logout();
+    $this->get("/campaigns/{$campaign->uuid}/stats")->assertRedirect('/login');
+});
+
 it('schedules in UTC and unschedules', function () {
     login();
     $campaign = Campaign::factory()->create();

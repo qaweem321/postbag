@@ -23,6 +23,7 @@ Route::middleware(['auth', 'no-store'])->group(function () {
 
     Route::resource('campaigns', CampaignController::class)->except('show');
     Route::get('/campaigns/{campaign}', [CampaignController::class, 'show'])->name('campaigns.show');
+    Route::get('/campaigns/{campaign}/stats', [CampaignController::class, 'stats'])->name('campaigns.stats');
     Route::post('/campaigns/{campaign}/test', [CampaignController::class, 'sendTest'])->name('campaigns.test')->middleware('throttle:10,1');
     Route::post('/campaigns/{campaign}/send', [CampaignController::class, 'send'])->name('campaigns.send');
     Route::post('/campaigns/{campaign}/schedule', [CampaignController::class, 'schedule'])->name('campaigns.schedule');

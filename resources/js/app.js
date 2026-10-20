@@ -58,6 +58,31 @@ if (themeSelect) {
     });
 }
 
+// Campaign statistics update without a reload: every 3 s while sending, every 15 s after (opens and
+// clicks keep coming in). Paused while the tab is hidden. When the status changes (sending → sent),
+// the whole page reloads so the header and buttons match.
+const liveStats = document.querySelector('[data-live-stats]');
+if (liveStats) {
+    const status = liveStats.dataset.status;
+    const refresh = async () => {
+        if (document.hidden) return schedule();
+        try {
+            const response = await fetch(liveStats.dataset.liveStats, { headers: { Accept: 'text/html' } });
+            // A redirect means the session ended; the next navigation shows the login page.
+            if (!response.ok || response.redirected) return;
+            const next = new DOMParser().parseFromString(await response.text(), 'text/html').querySelector('[data-live-stats]');
+            if (!next) return;
+            if (next.dataset.status !== status) return window.location.reload();
+            liveStats.replaceChildren(...next.childNodes);
+        } catch {
+            // Offline for a moment: try again on the next tick.
+        }
+        schedule();
+    };
+    const schedule = () => setTimeout(refresh, status === 'sending' ? 3000 : 15000);
+    schedule();
+}
+
 // A page restored from the back/forward cache may show a logged-out or outdated state: reload it.
 window.addEventListener('pageshow', (event) => {
     if (event.persisted) window.location.reload();
