@@ -21,6 +21,7 @@ the same email twice. Built with Laravel 13, MySQL and Blade.
   on every list.
 - **Statistics.** Delivered, opened, clicked, unsubscribed, and clicks per link, from signed tracking
   URLs that can't be faked or used as open redirects.
+- **Light, dark or system theme** for the dashboard, chosen in Settings and remembered in the browser.
 - **REST API** with Sanctum tokens (read/write abilities), cursor pagination, rate limits and an
   [OpenAPI description](docs/openapi.yaml) kept in sync by a test.
 - **WordPress plugin** ([wordpress-plugin/](wordpress-plugin/)): a Newsletter signup block and

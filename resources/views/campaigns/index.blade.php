@@ -15,7 +15,7 @@
                 <tbody>
                 @foreach ($campaigns as $campaign)
                     <tr>
-                        <td><a href="{{ route('campaigns.show', $campaign) }}" class="font-medium text-violet-700 hover:underline">{{ $campaign->name }}</a><span class="muted block text-xs">{{ $campaign->subject }}</span></td>
+                        <td><a href="{{ route('campaigns.show', $campaign) }}" class="font-medium text-violet-700 dark:text-violet-400 hover:underline">{{ $campaign->name }}</a><span class="muted block text-xs">{{ $campaign->subject }}</span></td>
                         <td>{{ $campaign->mailingList->name }}</td>
                         <td><x-status-badge :status="$campaign->status" /></td>
                         <td class="tabular-nums">{{ $campaign->status->isEditable() ? '–' : number_format($campaign->recipients_count) }}</td>

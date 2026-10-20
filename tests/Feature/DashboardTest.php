@@ -25,6 +25,16 @@ it('renders the login password field with a show/hide toggle', function () {
         ->assertSee('aria-label="Show password"', false);
 });
 
+it('offers a System, Light and Dark theme in settings and sets it before paint', function () {
+    $this->actingAs(User::factory()->create())->get('/settings')->assertOk()
+        ->assertSee('data-theme-select', false)
+        ->assertSeeInOrder(['value="system"', 'value="light"', 'value="dark"'], false)
+        ->assertSee("localStorage.getItem('theme')", false);
+    auth()->logout();
+    $this->get('/settings')->assertRedirect('/login');
+    $this->get('/login')->assertSee("localStorage.getItem('theme')", false);
+});
+
 it('rejects wrong passwords and rate-limits guessing', function () {
     User::factory()->create(['email' => 'admin@example.com']);
     for ($i = 0; $i < 5; $i++) {

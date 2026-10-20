@@ -1,13 +1,13 @@
 @php use App\Enums\CampaignStatus; @endphp
 <x-layouts.app :title="$campaign->name">
-    <p class="mb-2 text-sm"><a href="{{ route('campaigns.index') }}" class="text-violet-700 hover:underline">← Campaigns</a></p>
+    <p class="mb-2 text-sm"><a href="{{ route('campaigns.index') }}" class="text-violet-700 dark:text-violet-400 hover:underline">← Campaigns</a></p>
     <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
             <div class="flex items-center gap-3">
                 <h1 class="text-2xl font-semibold tracking-tight">{{ $campaign->name }}</h1>
                 <x-status-badge :status="$campaign->status" />
             </div>
-            <p class="muted mt-1 text-sm">“{{ $campaign->subject }}” to <a class="text-violet-700 underline" href="{{ route('lists.show', $campaign->mailingList) }}">{{ $campaign->mailingList->name }}</a>
+            <p class="muted mt-1 text-sm">“{{ $campaign->subject }}” to <a class="text-violet-700 dark:text-violet-400 underline" href="{{ route('lists.show', $campaign->mailingList) }}">{{ $campaign->mailingList->name }}</a>
                 @if ($campaign->status === CampaignStatus::Scheduled) · scheduled for <x-date :value="$campaign->scheduled_at" time /> @endif
                 @if ($campaign->started_at) · started <x-date :value="$campaign->started_at" time /> @endif
             </p>
@@ -22,7 +22,7 @@
                 </form>
             @elseif ($campaign->status !== CampaignStatus::Sending)
                 <form method="post" action="{{ route('campaigns.destroy', $campaign) }}" data-confirm="Are you sure? &quot;{{ $campaign->name }}&quot; and its statistics will be deleted.">
-                    @csrf @method('delete') <button class="btn-secondary text-red-700" data-pending="Deleting...">Delete</button>
+                    @csrf @method('delete') <button class="btn-secondary text-red-700 dark:text-red-400" data-pending="Deleting...">Delete</button>
                 </form>
             @endif
         </div>
@@ -36,7 +36,7 @@
         @if ($campaign->status === CampaignStatus::Sending)
             <div class="card mb-6 p-5">
                 <div class="mb-2 flex justify-between text-sm"><span class="font-medium">Sending…</span><span class="tabular-nums">{{ number_format($done) }} of {{ number_format($stats['recipients']) }}</span></div>
-                <div class="h-2 overflow-hidden rounded-full bg-zinc-100"><div class="h-full bg-violet-600" style="width: {{ $stats['recipients'] ? round($done / $stats['recipients'] * 100) : 0 }}%"></div></div>
+                <div class="h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800"><div class="h-full bg-violet-600" style="width: {{ $stats['recipients'] ? round($done / $stats['recipients'] * 100) : 0 }}%"></div></div>
                 <p class="muted mt-2 text-xs">Reload to update. Emails go out in batches through the queue worker.</p>
             </div>
         @endif

@@ -2,7 +2,7 @@
 <div class="relative">
     <input {{ $attributes->merge(['type' => 'password'])->class('input pr-10') }}>
     <button type="button" data-password-toggle aria-label="Show password" hidden
-        class="absolute inset-y-0 right-0 flex items-center rounded-r-lg px-3 text-zinc-500 hover:text-zinc-800 focus-visible:outline-2 focus-visible:outline-violet-600">
+        class="absolute inset-y-0 right-0 flex items-center rounded-r-lg px-3 text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 focus-visible:outline-2 focus-visible:outline-violet-600">
         <svg data-eye aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>
         </svg>

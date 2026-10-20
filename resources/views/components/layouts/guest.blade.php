@@ -7,6 +7,7 @@
     <meta name="description" content="Postbag: self-hosted newsletters with double opt-in, campaigns and one-click unsubscribe.">
     <title>{{ $title ? "$title · " : '' }}Postbag</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <x-theme-script />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="flex min-h-screen items-center justify-center px-4 py-12">

@@ -1,5 +1,5 @@
 <x-layouts.app :title="$list->name">
-    <p class="mb-2 text-sm"><a href="{{ route('lists.index') }}" class="text-violet-700 hover:underline">← Lists</a></p>
+    <p class="mb-2 text-sm"><a href="{{ route('lists.index') }}" class="text-violet-700 dark:text-violet-400 hover:underline">← Lists</a></p>
     <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
             <h1 class="text-2xl font-semibold tracking-tight">{{ $list->name }}</h1>
@@ -10,7 +10,7 @@
             <a href="{{ route('lists.edit', $list) }}" class="btn-secondary">Edit</a>
             <form method="post" action="{{ route('lists.destroy', $list) }}" data-confirm="Are you sure? &quot;{{ $list->name }}&quot; and all its subscriptions will be deleted. This can't be undone.">
                 @csrf @method('delete')
-                <button class="btn-secondary text-red-700" data-pending="Deleting...">Delete</button>
+                <button class="btn-secondary text-red-700 dark:text-red-400" data-pending="Deleting...">Delete</button>
             </form>
         </div>
     </div>
@@ -48,7 +48,7 @@
                                     @if ($subscription->status !== \App\Enums\SubscriptionStatus::Unsubscribed)
                                         <form method="post" action="{{ route('lists.unsubscribe', [$list, $subscription]) }}" data-confirm="Are you sure? {{ $subscription->subscriber->email }} will stop receiving this list.">
                                             @csrf
-                                            <button class="text-sm text-red-700 hover:underline" data-pending="...">Unsubscribe</button>
+                                            <button class="text-sm text-red-700 dark:text-red-400 hover:underline" data-pending="...">Unsubscribe</button>
                                         </form>
                                     @endif
                                 </td>
@@ -78,7 +78,7 @@
   -H "Authorization: Bearer $TOKEN" \
   -H "Accept: application/json" \
   -d email=jane@example.com</pre>
-                <p class="muted mt-2">Create a token with the “write” permission under <a class="text-violet-700 underline" href="{{ route('tokens.index') }}">API tokens</a>. The WordPress plugin uses the same endpoint.</p>
+                <p class="muted mt-2">Create a token with the “write” permission under <a class="text-violet-700 dark:text-violet-400 underline" href="{{ route('tokens.index') }}">API tokens</a>. The WordPress plugin uses the same endpoint.</p>
             </div>
         </aside>
     </div>

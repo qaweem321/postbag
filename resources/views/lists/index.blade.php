@@ -18,7 +18,7 @@
                 <tbody>
                 @foreach ($lists as $list)
                     <tr>
-                        <td><a href="{{ route('lists.show', $list) }}" class="font-medium text-violet-700 hover:underline">{{ $list->name }}</a></td>
+                        <td><a href="{{ route('lists.show', $list) }}" class="font-medium text-violet-700 dark:text-violet-400 hover:underline">{{ $list->name }}</a></td>
                         <td class="tabular-nums">{{ number_format($list->active_subscriptions_count) }}</td>
                         <td class="tabular-nums">{{ number_format($list->pending_count) }}</td>
                         <td>{{ $list->double_opt_in ? 'Yes' : 'No' }}</td>

@@ -2,7 +2,7 @@
     <h1 class="text-2xl font-semibold tracking-tight">API tokens</h1>
     <p class="muted mt-1 mb-6 text-sm">For the WordPress plugin and your own apps. Send it as <code>Authorization: Bearer &lt;token&gt;</code>.</p>
     @if (session('new_token'))
-        <div class="card mb-6 border-violet-300 p-5">
+        <div class="card mb-6 border-violet-300 dark:border-violet-800 p-5">
             <p class="font-medium">Your new token</p>
             <p class="muted text-sm">Copy it now. Only a hash is stored, so it can't be shown again.</p>
             <code class="mt-2 block break-all rounded bg-zinc-900 p-3 text-sm text-zinc-100">{{ session('new_token') }}</code>
@@ -25,7 +25,7 @@
                                 <td class="muted whitespace-nowrap"><x-date :value="$token->created_at" /></td>
                                 <td class="text-right">
                                     <form method="post" action="{{ route('tokens.destroy', $token->id) }}" data-confirm="Are you sure? Anything using &quot;{{ $token->name }}&quot; stops working immediately.">
-                                        @csrf @method('delete') <button class="text-sm text-red-700 hover:underline" data-pending="...">Revoke</button>
+                                        @csrf @method('delete') <button class="text-sm text-red-700 dark:text-red-400 hover:underline" data-pending="...">Revoke</button>
                                     </form>
                                 </td>
                             </tr>

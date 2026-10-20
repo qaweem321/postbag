@@ -3,6 +3,9 @@
 @source '../views/**/*.blade.php';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
+/* Dark mode follows the .dark class set by the theme script (Settings → Appearance). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @utility btn {
     @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60;
 }
@@ -10,27 +13,33 @@
     @apply btn bg-violet-700 text-white hover:bg-violet-600;
 }
 @utility btn-secondary {
-    @apply btn border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50;
+    @apply btn border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800;
 }
 @utility btn-danger {
     @apply btn bg-red-600 text-white hover:bg-red-500;
 }
 @utility card {
-    @apply rounded-xl border border-zinc-200 bg-white shadow-sm;
+    @apply rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900;
 }
 @utility input {
-    @apply block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm shadow-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-600/20;
+    @apply block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm shadow-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-600/20 dark:border-zinc-700 dark:bg-zinc-950;
 }
 @utility label {
-    @apply mb-1 block text-sm font-medium text-zinc-700;
+    @apply mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300;
 }
 @utility muted {
-    @apply text-zinc-500;
+    @apply text-zinc-500 dark:text-zinc-400;
 }
 
 @layer base {
+    :root {
+        color-scheme: light;
+    }
+    :root.dark {
+        color-scheme: dark;
+    }
     body {
-        @apply bg-zinc-50 text-zinc-900 antialiased;
+        @apply bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100;
     }
 }
 
@@ -39,10 +48,10 @@
         @apply w-full text-left text-sm;
     }
     .table th {
-        @apply border-b border-zinc-200 px-4 py-2.5 text-xs font-semibold tracking-wide text-zinc-500 uppercase;
+        @apply border-b border-zinc-200 px-4 py-2.5 text-xs font-semibold tracking-wide text-zinc-500 uppercase dark:border-zinc-800 dark:text-zinc-400;
     }
     .table td {
-        @apply border-b border-zinc-100 px-4 py-3 align-top;
+        @apply border-b border-zinc-100 px-4 py-3 align-top dark:border-zinc-800;
     }
     .table tr:last-child td {
         @apply border-b-0;

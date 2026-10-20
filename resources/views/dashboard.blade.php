@@ -20,9 +20,9 @@
             @if ($recentCampaigns->isEmpty())
                 <div class="card px-6 py-10 text-center"><p class="muted">No campaigns yet.</p></div>
             @else
-                <div class="card divide-y divide-zinc-100">
+                <div class="card divide-y divide-zinc-100 dark:divide-zinc-800">
                     @foreach ($recentCampaigns as $campaign)
-                        <a href="{{ route('campaigns.show', $campaign) }}" class="flex items-center justify-between gap-4 px-4 py-3 hover:bg-zinc-50">
+                        <a href="{{ route('campaigns.show', $campaign) }}" class="flex items-center justify-between gap-4 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800">
                             <span><span class="font-medium">{{ $campaign->name }}</span><span class="muted block text-xs">{{ $campaign->mailingList->name }}</span></span>
                             <x-status-badge :status="$campaign->status" />
                         </a>

@@ -6,7 +6,7 @@
         @csrf
         <h1 class="text-xl font-semibold">Log in</h1>
         @error('email')
-            <p role="alert" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">{{ $message }}</p>
+            <p role="alert" class="rounded-lg bg-red-50 dark:bg-red-950 px-3 py-2 text-sm text-red-800 dark:text-red-200">{{ $message }}</p>
         @enderror
         <div>
             <label class="label" for="email">Email</label>

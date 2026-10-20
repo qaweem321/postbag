@@ -37,6 +37,27 @@ document.addEventListener('click', (event) => {
     button.querySelector('[data-eye-off]').toggleAttribute('hidden', !show);
 });
 
+// Settings → Appearance: save the theme in this browser and apply it right away. The theme script
+// in <head> applies it on every page load.
+const themeSelect = document.querySelector('[data-theme-select]');
+if (themeSelect) {
+    const dark = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
+    try {
+        themeSelect.value = localStorage.getItem('theme') ?? 'system';
+    } catch {
+        // Storage can be blocked; the select then starts at System.
+    }
+    themeSelect.addEventListener('change', () => {
+        const theme = themeSelect.value;
+        try {
+            localStorage.setItem('theme', theme);
+        } catch {
+            // Blocked storage: the choice lasts until the page reloads.
+        }
+        document.documentElement.classList.toggle('dark', theme === 'dark' || (theme === 'system' && dark()));
+    });
+}
+
 // A page restored from the back/forward cache may show a logged-out or outdated state: reload it.
 window.addEventListener('pageshow', (event) => {
     if (event.persisted) window.location.reload();

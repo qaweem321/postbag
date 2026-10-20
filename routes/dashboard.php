@@ -29,6 +29,8 @@ Route::middleware(['auth', 'no-store'])->group(function () {
     Route::post('/campaigns/{campaign}/unschedule', [CampaignController::class, 'unschedule'])->name('campaigns.unschedule');
     Route::post('/campaigns/{campaign}/cancel', [CampaignController::class, 'cancel'])->name('campaigns.cancel');
 
+    Route::view('/settings', 'settings')->name('settings');
+
     Route::get('/tokens', [TokenController::class, 'index'])->name('tokens.index');
     Route::post('/tokens', [TokenController::class, 'store'])->name('tokens.store');
     Route::delete('/tokens/{token}', [TokenController::class, 'destroy'])->name('tokens.destroy');
