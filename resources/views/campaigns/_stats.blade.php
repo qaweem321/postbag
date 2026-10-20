@@ -1,7 +1,9 @@
 @php use App\Enums\CampaignStatus; @endphp
-{{-- Campaign statistics. Rendered in campaigns/show and by the stats route, which app.js polls so
-     the numbers update without reloading. --}}
-<div data-live-stats="{{ route('campaigns.stats', $campaign) }}" data-status="{{ $campaign->status->value }}">
+{{-- Campaign statistics. Rendered in campaigns/show and by the stats route, which app.js polls (a
+     live region) so the numbers update without reloading. --}}
+{{-- Every 3 s while sending, every 15 s after: opens and clicks keep coming in. --}}
+<div id="campaign-stats" data-live="{{ route('campaigns.stats', $campaign) }}" data-live-key="{{ $campaign->status->value }}"
+     data-live-every="{{ $campaign->status === CampaignStatus::Sending ? 3000 : 15000 }}">
     @php
         $pct = fn (?float $rate) => $rate === null ? '–' : number_format($rate * 100, 1).'%';
         $done = $stats['recipients'] - $stats['queued'];

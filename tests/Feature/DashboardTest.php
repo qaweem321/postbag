@@ -104,14 +104,41 @@ it('serves live campaign statistics for the page to poll', function () {
     $this->get("/campaigns/{$campaign->uuid}/stats")->assertNotFound();
 
     $this->post("/campaigns/{$campaign->uuid}/send");
-    $this->get("/campaigns/{$campaign->uuid}")->assertSee('data-live-stats', false);
+    $this->get("/campaigns/{$campaign->uuid}")->assertSee('id="campaign-stats"', false);
     $this->get("/campaigns/{$campaign->uuid}/stats")->assertOk()
-        ->assertSee('data-status="sent"', false)
+        ->assertSee('data-live-key="sent"', false)
+        ->assertSee('data-live-every="15000"', false)
         ->assertSee('Delivered')
         ->assertDontSee('<html', false);
 
     auth()->logout();
     $this->get("/campaigns/{$campaign->uuid}/stats")->assertRedirect('/login');
+});
+
+it('refreshes the campaigns list and dashboard only while a campaign is sending', function () {
+    login();
+    $campaign = Campaign::factory()->create();
+
+    $this->get('/campaigns')->assertSee('id="campaign-table"', false)->assertDontSee('data-live-every', false);
+    $this->get('/')->assertSee('id="dashboard-live"', false)->assertDontSee('data-live-every', false);
+
+    $campaign->forceFill(['status' => CampaignStatus::Sending])->save();
+    $this->get('/campaigns')->assertSee('data-live-every="3000"', false);
+    $this->get('/')->assertSee('data-live-every="3000"', false);
+});
+
+it('counts people who subscribed after the list page loaded', function () {
+    login();
+    $list = MailingList::factory()->create();
+    $shown = Subscription::factory()->for($list)->create();
+    Subscription::factory()->for(MailingList::factory())->create(); // another list
+
+    $this->get("/lists/{$list->uuid}")->assertSee("after={$shown->uuid}", false);
+    $this->getJson("/lists/{$list->uuid}/new-subscribers?after={$shown->uuid}")->assertExactJson(['count' => 0]);
+
+    Subscription::factory()->count(2)->for($list)->create();
+    $this->getJson("/lists/{$list->uuid}/new-subscribers?after={$shown->uuid}")->assertExactJson(['count' => 2]);
+    $this->getJson("/lists/{$list->uuid}/new-subscribers?after=not-a-uuid")->assertUnprocessable();
 });
 
 it('schedules in UTC and unschedules', function () {

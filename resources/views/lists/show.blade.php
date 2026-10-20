@@ -27,6 +27,11 @@
                 </select>
                 <button class="btn-secondary" data-pending="Searching...">Filter</button>
             </form>
+            <p data-new-subscribers="{{ route('lists.new-subscribers', ['list' => $list, 'after' => $newestUuid]) }}" hidden
+               class="mb-4 flex items-center justify-between gap-3 rounded-lg border border-violet-200 bg-violet-50 px-4 py-2 text-sm text-violet-800 dark:border-violet-900 dark:bg-violet-950 dark:text-violet-200">
+                <span data-count></span>
+                <a href="{{ route('lists.show', $list) }}" class="font-medium underline">Show them</a>
+            </p>
             @if ($subscriptions->isEmpty())
                 <div class="card px-6 py-12 text-center"><p class="font-medium">No subscribers {{ ($filters['q'] ?? $filters['status'] ?? null) ? 'match these filters' : 'yet' }}</p></div>
             @else

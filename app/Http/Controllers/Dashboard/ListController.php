@@ -9,6 +9,7 @@ use App\Http\Requests\ListRequest;
 use App\Models\MailingList;
 use App\Models\Subscription;
 use App\Services\SubscriptionManager;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -57,7 +58,21 @@ class ListController extends Controller
             'list' => $list->loadCount('activeSubscriptions'),
             'subscriptions' => $subscriptions,
             'filters' => $filters,
+            // The page asks later how many people subscribed after this one (see newSubscribers).
+            'newestUuid' => $list->subscriptions()->latest('id')->value('uuid'),
         ]);
+    }
+
+    // How many subscriptions were added after the given one: the list page polls this and offers to show them.
+    public function newSubscribers(Request $request, MailingList $list): JsonResponse
+    {
+        $after = $request->validate(['after' => ['nullable', 'uuid']])['after'] ?? null;
+        $query = $list->subscriptions();
+        if ($after) {
+            $query->where('id', '>', $list->subscriptions()->where('uuid', $after)->select('id')->toBase());
+        }
+
+        return response()->json(['count' => $query->count()]);
     }
 
     public function edit(MailingList $list): View

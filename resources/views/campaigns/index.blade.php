@@ -9,7 +9,9 @@
             <p class="muted mt-1 text-sm">Write one, send yourself a test, then send it to a list.</p>
         </div>
     @else
-        <div class="card overflow-x-auto">
+        {{-- Refreshes every 3 s while a campaign on this page is sending, then stops. --}}
+        <div id="campaign-table" class="card overflow-x-auto" data-live
+             @if ($campaigns->contains('status', \App\Enums\CampaignStatus::Sending)) data-live-every="3000" @endif>
             <table class="table">
                 <thead><tr><th>Campaign</th><th>List</th><th>Status</th><th>Recipients</th><th>Date</th></tr></thead>
                 <tbody>

@@ -18,6 +18,7 @@ Route::middleware(['auth', 'no-store'])->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
 
     Route::resource('lists', ListController::class);
+    Route::get('/lists/{list}/new-subscribers', [ListController::class, 'newSubscribers'])->name('lists.new-subscribers');
     Route::post('/lists/{list}/subscribers', [ListController::class, 'addSubscriber'])->name('lists.subscribers.store');
     Route::post('/lists/{list}/subscriptions/{subscription}/unsubscribe', [ListController::class, 'unsubscribe'])->name('lists.unsubscribe');
 

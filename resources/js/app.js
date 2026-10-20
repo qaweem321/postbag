@@ -58,29 +58,59 @@ if (themeSelect) {
     });
 }
 
-// Campaign statistics update without a reload: every 3 s while sending, every 15 s after (opens and
-// clicks keep coming in). Paused while the tab is hidden. When the status changes (sending → sent),
-// the whole page reloads so the header and buttons match.
-const liveStats = document.querySelector('[data-live-stats]');
-if (liveStats) {
-    const status = liveStats.dataset.status;
-    const refresh = async () => {
-        if (document.hidden) return schedule();
-        try {
-            const response = await fetch(liveStats.dataset.liveStats, { headers: { Accept: 'text/html' } });
-            // A redirect means the session ended; the next navigation shows the login page.
-            if (!response.ok || response.redirected) return;
-            const next = new DOMParser().parseFromString(await response.text(), 'text/html').querySelector('[data-live-stats]');
-            if (!next) return;
-            if (next.dataset.status !== status) return window.location.reload();
-            liveStats.replaceChildren(...next.childNodes);
-        } catch {
-            // Offline for a moment: try again on the next tick.
+// Live regions update without a reload: <div id="..." data-live="URL" data-live-every="ms" data-live-key="...">.
+// Every few ms the URL (default: this page) is fetched and the element with the same id swapped in.
+// A copy without data-live-every means nothing is changing any more, so polling stops. A changed
+// data-live-key (a campaign going from sending to sent) reloads the page so header and buttons match.
+// Paused while the tab is hidden; a redirect (session ended) stops it.
+for (const region of document.querySelectorAll('[data-live]')) {
+    const url = region.dataset.live || window.location.href;
+    const schedule = () => {
+        const every = Number(region.dataset.liveEvery);
+        if (every) setTimeout(tick, every);
+    };
+    const tick = async () => {
+        if (!document.hidden) {
+            try {
+                const response = await fetch(url, { headers: { Accept: 'text/html' } });
+                if (!response.ok || response.redirected) return;
+                const next = new DOMParser().parseFromString(await response.text(), 'text/html').getElementById(region.id);
+                if (next) {
+                    if (next.dataset.liveKey !== region.dataset.liveKey) return window.location.reload();
+                    region.replaceChildren(...next.childNodes);
+                    region.dataset.liveEvery = next.dataset.liveEvery ?? '';
+                }
+            } catch {
+                // Offline for a moment: try again on the next tick.
+            }
         }
         schedule();
     };
-    const schedule = () => setTimeout(refresh, status === 'sending' ? 3000 : 15000);
     schedule();
+}
+
+// A list's page checks every 30 s for people who subscribed since it loaded, and offers to show them
+// instead of moving rows while someone reads or clicks the table.
+const newSubscribers = document.querySelector('[data-new-subscribers]');
+if (newSubscribers) {
+    const check = async () => {
+        if (!document.hidden) {
+            try {
+                const response = await fetch(newSubscribers.dataset.newSubscribers, { headers: { Accept: 'application/json' } });
+                if (!response.ok || response.redirected) return;
+                const { count } = await response.json();
+                if (count > 0) {
+                    newSubscribers.querySelector('[data-count]').textContent =
+                        `${count} new ${count === 1 ? 'subscriber' : 'subscribers'}`;
+                    newSubscribers.hidden = false;
+                }
+            } catch {
+                // Try again on the next check.
+            }
+        }
+        setTimeout(check, 30000);
+    };
+    setTimeout(check, 30000);
 }
 
 // A page restored from the back/forward cache may show a logged-out or outdated state: reload it.
