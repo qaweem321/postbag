@@ -84,6 +84,31 @@ curl -X POST http://localhost:8080/api/v1/lists/<list-id>/subscribers \
 
 Create tokens on the **API tokens** page. Full reference: [docs/openapi.yaml](docs/openapi.yaml).
 
+## Project structure
+
+```
+app/                         Laravel app (PHP)
+  Http/Controllers/
+    Api/V1/                  REST API: lists, subscribers, campaigns
+    Dashboard/               the dashboard: lists, campaigns, API tokens
+    Public/                  confirm and unsubscribe links, open and click tracking
+  Services/                  the main logic: subscriptions, rendering, sending and stats for campaigns
+  Jobs/SendCampaignBatch.php sends a campaign in batches on the queue
+  Console/Commands/          create a user, send scheduled campaigns
+  Models/, Mail/, Enums/     database models, emails, status values
+routes/                      web.php, dashboard.php, api.php, console.php (scheduler)
+resources/views/             Blade pages and email templates
+database/                    migrations, factories, seeders
+tests/                       Pest tests for the Laravel app
+wordpress-plugin/            the WordPress plugin
+  includes/                  settings page, signup form, REST endpoint, API client, WP-CLI command
+  blocks/signup/             the signup block for the editor
+  tests/                     PHPUnit tests (Brain Monkey)
+docs/                        design choices and the OpenAPI file
+docker/, docker-compose.yml  MySQL, app, queue worker, scheduler, Mailpit and a test WordPress
+Makefile                     the commands under Development
+```
+
 ## Development
 
 Everything runs in Docker; PHP and Composer don't need to be installed.
